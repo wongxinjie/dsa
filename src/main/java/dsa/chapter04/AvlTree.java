@@ -44,24 +44,51 @@ public class AvlTree<T extends Comparable<? super T>>{
     }
 
     private AvlNode<T> remove(T x, AvlNode<T> t) {
-        //TODO: implement AVL remove action
-        /*
-        if(t == null)
+        if (t == null) {
             return t;
+        }
 
         int compareResult = x.compareTo(t.element);
-        if(compareResult < 0) {
-            t.left = remove(x, t.left);
-        } else if(compareResult > 0) {
+        if (compareResult > 0) {
             t.right = remove(x, t.right);
-        } else if(t.left != null && t.right != null) {
-            t.element = findMin(t.right).element;
-            t.right = remove(t.element, t.right);
+        } else if (compareResult < 0) {
+            t.left = remove(x, t.left);
         } else {
-            t = (t.left != null) ? t.left : t.right;
-        }
-        */
+            if (t.left != null && t.right != null) {
+                // find min element of right subtree
+                AvlNode<T> replace = t.right;
+                while (replace.left != null) {
+                    replace = replace.left;
+                }
 
+                t.element = replace.element;
+                t.right = remove(replace.element, t.right);
+            } else {
+                AvlNode<T> r = t;
+                r = t.left != null ? r.left : r.right;
+                return r;
+            }
+        }
+
+        t.height = Math.max(height(t.right), height(root.left)) + 1;
+
+        int balance = getBalance(t);
+        //LL
+        if (balance > 1 && getBalance(t.left) >= 0) {
+            t = rotateWithLeftChild(t);
+        }
+        //RR
+        if (balance < -1 && getBalance(t.right) <= 0) {
+            t = rotateWithRightChild(t);
+        }
+        //LR
+        if (balance > 1 && getBalance(t.left) < 0) {
+            t = rotateWithRightLeftChild(t);
+        }
+        //RL
+        if (balance < -1 && getBalance(t.right) > 0) {
+            t = rotateWithLeftRightChild(t);
+        }
         return t;
     }
 
@@ -107,13 +134,13 @@ public class AvlTree<T extends Comparable<? super T>>{
                 if(compare(x, t.left.element) < 0)
                     t = rotateWithLeftChild(t);
                 else
-                    t = doubleWithLeftChild(t);
+                    t = rotateWithRightLeftChild(t);
             }
         } else if(compareResult > 0) {
             t.right = insert(x, t.right);
             if(height(t.right) - height(t.left) == 2) {
                 if(compare(x, t.right.element) < 0)
-                    t = doubleWithRightChild(t);
+                    t = rotateWithLeftRightChild(t);
                 else
                     t = rotateWithRightChild(t);
             }
@@ -153,16 +180,33 @@ public class AvlTree<T extends Comparable<? super T>>{
         return rightChild;
     }
 
-    private AvlNode<T> doubleWithLeftChild(AvlNode<T> node) {
+    private AvlNode<T> rotateWithRightLeftChild(AvlNode<T> node) {
         // LR -> LL
         node.left = rotateWithRightChild(node.left);
         return rotateWithLeftChild(node);
     }
 
-    private AvlNode<T> doubleWithRightChild(AvlNode<T> node) {
+    private AvlNode<T> rotateWithLeftRightChild(AvlNode<T> node) {
         // RL -> RR
         node.right  = rotateWithLeftChild(node.right);
         return rotateWithRightChild(node);
     }
 
+    private int getBalance(AvlNode<T> node) {
+        if (node == null) return 0;
+        return height(node.left) - height(node.right);
+    }
+
+    public void inOrderTravel(AvlNode<T> node){
+        if (node == null) return;
+
+        inOrderTravel(node.left);
+        System.out.print(node.element + " ");
+        inOrderTravel(node.right);
+    }
+
+    public void print() {
+        inOrderTravel(root);
+        System.out.println();
+    }
 }
