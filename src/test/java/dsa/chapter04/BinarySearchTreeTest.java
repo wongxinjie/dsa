@@ -1,10 +1,10 @@
 package dsa.chapter04;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,9 +21,12 @@ public class BinarySearchTreeTest {
         Collections.shuffle(list);
 
 
+        System.out.println(list);
         for(Integer n: list) {
             tree.insert(n);
         }
+
+        tree.printTree();
 
         int min = tree.findMin();
         System.out.println(min);
@@ -39,4 +42,5 @@ public class BinarySearchTreeTest {
         tree.insert(x);
         assertEquals(tree.findMax(), x);
     }
+
 }

@@ -1,5 +1,8 @@
 package dsa.chapter04;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class BinarySearchTree<T extends Comparable<? super T>> {
 
     private static class BinaryNode<T> {
@@ -20,6 +23,10 @@ public class BinarySearchTree<T extends Comparable<? super T>> {
 
     private BinaryNode<T> root;
 
+    protected BinaryNode<T> getRoot() {
+        return this.root;
+    }
+
     public BinarySearchTree() {
         root = null;
     }
@@ -27,6 +34,7 @@ public class BinarySearchTree<T extends Comparable<? super T>> {
     public void makeEmpty() {
         this.root = null;
     }
+
 
     public boolean isEmpty() {
         return root == null;
@@ -136,10 +144,93 @@ public class BinarySearchTree<T extends Comparable<? super T>> {
         }
     }
 
+    private void postOrder(BinaryNode<T> t) {
+        if (t != null) {
+            postOrder(t.left);
+            postOrder(t.right);
+            System.out.println(t.element + "");
+        }
+    }
+
+    private void levelOrder(BinaryNode<T> t) {
+        Queue<BinaryNode<T>> nodes = new LinkedList<>();
+        nodes.add(t);
+
+        while (!nodes.isEmpty()) {
+            BinaryNode<T> n = nodes.remove();
+            System.out.print(n.element + " ");
+            if (n.left != null) {
+                nodes.add(n.left);
+            }
+            if (n.right != null) {
+                nodes.add(n.right);
+            }
+        }
+        System.out.println();
+    }
+
     public void printTree() {
         if(isEmpty())
             System.out.println("Empty tree");
         else
-            inorder(root);
+            // inorder(root);
+            levelOrder(root);
+    }
+
+    /**
+     * 求树的叶子树
+     * @param t
+     * @return
+     */
+    public int leaveCount(BinaryNode<T> t) {
+        if(t == null)
+            return 0;
+        if(t.left == null && t.right == null)
+            return 1;
+
+        return leaveCount(t.left) + leaveCount(t.right);
+    }
+
+    public int depth(BinaryNode<T> t) {
+        if(t == null)
+            return 0;
+
+        int leftDepth = depth(t.left) + 1;
+        int rightDepth = depth(t.right) + 1;
+        return leftDepth > rightDepth ? leftDepth : rightDepth;
+    }
+
+    public boolean isSameStruct(BinarySearchTree<T> other) {
+        return isSameStruct(other.getRoot(), this.root);
+    }
+
+    /**
+     * 两棵树的结构是否相同
+     * @param x
+     * @param y
+     * @return
+     */
+    private boolean isSameStruct(BinaryNode<T> x, BinaryNode<T> y) {
+        if (x == null && y == null)
+            return true;
+        else if (x == null || y == null)
+            return false;
+        return isSameStruct(x.left, y.left) && isSameStruct(x.right, y.right);
+    }
+
+    /**
+     * 树的镜像树
+     * @param t
+     */
+    public void mirror(BinaryNode<T> t) {
+        if (t == null)
+            return;
+
+        BinaryNode<T> n = t.left;
+        t.left = t.right;
+        t.right = n;
+
+        mirror(t.left);
+        mirror(t.right);
     }
 }
